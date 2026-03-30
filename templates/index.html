@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Event Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>Smart Event Management</h1>
+    <div class="card text-center">
+        <h2>Choose Login</h2>
+        <p>
+            <a class="btn" href="{{ url_for('login') }}">Student Login</a>
+            <a class="btn secondary" href="{{ url_for('admin_login') }}">Admin Login</a>
+        </p>
+        <p class="hint">New user? Register from the Student Login page.</p>
+    </div>
+</div>
+</body>
+</html>
+

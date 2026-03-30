@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Smart Event Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Manage events, registrations and attendance</p>
+        </div>
+        <nav>
+            <a class="btn secondary" href="{{ url_for('qr_scanner') }}">QR Scanner</a>
+            <a class="btn secondary" href="{{ url_for('view_attendance') }}">Attendance Records</a>
+            <a class="btn secondary" href="{{ url_for('dashboard') }}">Admin Dashboard</a>
+            <a class="btn danger" href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <section class="grid">
+        <div class="card">
+            <h2>Create New Event</h2>
+            <form method="POST" action="{{ url_for('admin_panel') }}">
+                <label for="title">Event Name</label>
+                <input type="text" id="title" name="title" required>
+
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" required>
+
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+
+                <label for="time">Time</label>
+                <input type="time" id="time" name="time" required>
+
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="3"></textarea>
+
+                <button type="submit">Create Event</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Existing Events</h2>
+            {% if events %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Location</th>
+                        <th>Description</th>
+                        <th>Registrations</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for e in events %}
+                        <tr>
+                            <td>{{ e.title }}</td>
+                            <td>{{ e.date }}</td>
+                            <td>{{ e.event_time }}</td>
+                            <td>{{ e.location }}</td>
+                            <td>{{ e.description }}</td>
+                            <td>{{ e.registrations_count }}</td>
+                            <td>
+                                <a class="btn small" href="{{ url_for('view_event_registrations', event_id=e.event_id) }}">View Students</a>
+                                <a class="btn small" href="{{ url_for('edit_event', event_id=e.event_id) }}">Edit</a>
+                                <form method="POST" action="{{ url_for('delete_event', event_id=e.event_id) }}" style="display:inline;">
+                                    <button type="submit" class="btn small danger" onclick="return confirm('Delete this event?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No events created yet.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+</body>
+</html>
+

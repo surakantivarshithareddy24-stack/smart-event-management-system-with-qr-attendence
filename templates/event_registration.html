@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <div>
+            <h1>Register for Event</h1>
+            <p>
+                <strong>{{ event.title }}</strong>
+                ({{ event.date }} {{ event.event_time }} at {{ event.location }})
+            </p>
+        </div>
+        <nav>
+            <a class="btn secondary" href="{{ url_for('dashboard') }}">Back</a>
+            <a class="btn danger" href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <h2>Student Details</h2>
+        <form method="POST">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" value="{{ user.name if user else '' }}" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ user.email if user else '' }}" required>
+
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" placeholder="Enter phone number" required>
+
+            <label for="event_name">Event</label>
+            <input type="text" id="event_name"
+                   value="{{ event.title }} - {{ event.date }} {{ event.event_time }} at {{ event.location }}"
+                   readonly>
+
+            <button type="submit">Submit Registration</button>
+        </form>
+
+        <p class="hint">After submitting, you will get a QR code for attendance.</p>
+    </div>
+</div>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Registration - Smart Event Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    {% if edit_mode %}
+        <header class="top-bar">
+            <div>
+                <h1>Edit Event</h1>
+                <p>Update event details</p>
+            </div>
+            <nav>
+                <a class="btn secondary" href="{{ url_for('admin_panel') }}">Back to Admin</a>
+            </nav>
+        </header>
+        <div class="card">
+            <form method="POST">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" value="{{ event.title }}" required>
+
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="3">{{ event.description }}</textarea>
+
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" value="{{ event.date }}" required>
+
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" value="{{ event.location }}" required>
+
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    {% elif registrations is defined %}
+        <header class="top-bar">
+            <div>
+                <h1>Event Registrations</h1>
+                <p>Students registered for: {{ event.title }}</p>
+            </div>
+            <nav>
+                <a class="btn secondary" href="{{ url_for('admin_panel') }}">Back to Admin</a>
+            </nav>
+        </header>
+        <div class="card">
+            {% if registrations %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Registered At</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for r in registrations %}
+                        <tr>
+                            <td>{{ r.name }}</td>
+                            <td>{{ r.email }}</td>
+                            <td>{{ r.phone }}</td>
+                            <td>{{ r.registered_at }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No one has registered for this event yet.</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <header class="top-bar">
+            <div>
+                <h1>Register for Event</h1>
+                <p>{{ event.title }} – {{ event.date }} at {{ event.location }}</p>
+            </div>
+            <nav>
+                <a class="btn secondary" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+            </nav>
+        </header>
+
+        <div class="card">
+            <form method="POST">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="{{ session.get('user_name') }}" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" required>
+
+                <button type="submit">Submit Registration</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>
+

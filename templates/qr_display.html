@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your QR Code - Smart Event Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <div>
+            <h1>Your QR Code</h1>
+            <p>Event: {{ event_title }}</p>
+        </div>
+        <nav>
+            <a class="btn secondary" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+            <a class="btn danger" href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    <div class="card text-center">
+        <p>Show this QR at the event. <strong>Tip:</strong> turn screen brightness up; zoom the image so the QR is <strong>big</strong> when the admin scans it.</p>
+        <img class="qr-code-display" src="{{ qr_url }}" alt="QR Code" style="max-width: 760px; width: 100%; min-width: 280px; height: auto; image-rendering: pixelated;">
+    </div>
+</div>
+</body>
+</html>
+

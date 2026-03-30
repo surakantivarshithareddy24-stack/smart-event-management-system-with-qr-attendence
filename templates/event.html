@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event - Smart Event Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    {% if edit_mode %}
+        <header class="top-bar">
+            <div>
+                <h1>Edit Event</h1>
+            </div>
+            <nav>
+                <a class="btn secondary" href="{{ url_for('dashboard') }}">Back</a>
+            </nav>
+        </header>
+
+        <div class="card">
+            <form method="POST">
+                <label for="title">Event Name</label>
+                <input type="text" id="title" name="title" value="{{ event.title }}" required>
+
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" value="{{ event.date }}" required>
+
+                <label for="time">Time</label>
+                <input type="time" id="time" name="time" value="{{ event.event_time }}" required>
+
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" value="{{ event.location }}" required>
+
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4">{{ event.description }}</textarea>
+
+                <button type="submit">Save</button>
+            </form>
+        </div>
+
+    {% elif registrations is defined %}
+        <header class="top-bar">
+            <div>
+                <h1>Registered Students</h1>
+                <p>Event: {{ event.title }}</p>
+            </div>
+            <nav>
+                <a class="btn secondary" href="{{ url_for('dashboard') }}">Back</a>
+            </nav>
+        </header>
+
+        <div class="card">
+            {% if registrations %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for r in registrations %}
+                        <tr>
+                            <td>{{ r.user_id }}</td>
+                            <td>{{ r.name }}</td>
+                            <td>{{ r.email }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No registrations yet.</p>
+            {% endif %}
+        </div>
+
+    {% else %}
+        <header class="top-bar">
+            <div>
+                <h1>Event Registration</h1>
+                <p><strong>{{ event.title }}</strong> ({{ event.date }})</p>
+            </div>
+            <nav>
+                <a class="btn secondary" href="{{ url_for('dashboard') }}">Back</a>
+            </nav>
+        </header>
+
+        <div class="card">
+            <h2>Student Details</h2>
+            <form method="POST">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" value="{{ user.name if user else '' }}" readonly>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email if user else '' }}" readonly>
+
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" placeholder="Enter phone number" required>
+
+                <label for="event_name">Event</label>
+                <input type="text" id="event_name" value="{{ event.title }}" readonly>
+
+                <button type="submit">Confirm Registration</button>
+            </form>
+            <p class="hint">After registering, you will get a QR code for attendance.</p>
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>
+

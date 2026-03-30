@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Page not found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>404 — Page not found</h1>
+    <div class="card">
+        <p>The address you opened is not part of this app. Use one of these links:</p>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('login') }}">Student login</a></li>
+            <li><a href="{{ url_for('admin_login') }}">Admin login</a></li>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a> (after login)</li>
+            <li><a href="{{ url_for('qr_scanner') }}">QR scanner</a> (admin, after login)</li>
+        </ul>
+        <p class="hint">Correct base URL: <code>http://127.0.0.1:5000</code> — QR scanner path is <strong>/qr_scanner</strong> (underscore, not a space).</p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Attendance — QR Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <div>
+            <h1>Mark attendance</h1>
+            <p><strong>Admin only.</strong> Please allow camera access and scan the QR code.</p>
+        </div>
+        <nav>
+            <a class="btn secondary" href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class="btn danger" href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ONLY CAMERA SCANNER -->
+    <div class="card">
+        <h2>QR Code Scanner</h2>
+        <p class="hint">
+            Open <code>http://127.0.0.1:5000/qr_scanner</code> in Chrome or Edge.
+            Allow camera and keep QR code steady.
+        </p>
+
+        <p>
+            <label for="camera-select">Camera</label><br>
+            <select id="camera-select" style="max-width:100%;min-width:220px;"></select>
+        </p>
+
+        <div id="qr-reader" class="qr-reader-box"></div>
+
+        <p class="text-center" style="margin-top:12px;">
+            <button type="button" id="btn-start" class="btn" disabled>Start camera</button>
+            <button type="button" id="btn-stop" class="btn secondary" disabled>Stop</button>
+        </p>
+
+        <p id="scan-result" class="text-center"
+           style="margin-top:8px;font-weight:bold;min-height:1.5em;"></p>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script>
+(function () {
+    var resultEl = document.getElementById("scan-result");
+    var btnStart = document.getElementById("btn-start");
+    var btnStop = document.getElementById("btn-stop");
+    var cameraSelect = document.getElementById("camera-select");
+
+    var busy = false;
+    var html5QrCode = null;
+    var running = false;
+
+    function showMsg(text, ok) {
+        if (resultEl) {
+            resultEl.textContent = text;
+            resultEl.style.color = ok ? "#2e7d32" : "#c62828";
+        }
+    }
+
+    if (typeof Html5Qrcode === "undefined") {
+        showMsg("Scanner not loaded. Check internet.", false);
+    } else {
+        html5QrCode = new Html5Qrcode("qr-reader", false);
+    }
+
+    function handleToken(raw) {
+        var token = String(raw || "").trim();
+        if (!token || busy) return;
+
+        busy = true;
+        showMsg("Marking attendance...", true);
+
+        markAttendance(token, function (data) {
+            busy = false;
+            if (data && data.status === "ok") {
+                showMsg("Attendance marked successfully!", true);
+                setTimeout(function () { location.reload(); }, 1000);
+            } else {
+                showMsg("Failed to mark attendance.", false);
+            }
+        });
+    }
+
+    function onDecodeSuccess(decodedText) {
+        if (busy) return;
+
+        html5QrCode.stop().then(function () {
+            setRunning(false);
+            handleToken(decodedText);
+        });
+    }
+
+    function setRunning(on) {
+        running = on;
+        btnStart.disabled = on;
+        btnStop.disabled = !on;
+    }
+
+    function startCamera() {
+        var camId = cameraSelect.value;
+        if (!camId) {
+            showMsg("Select camera first", false);
+            return;
+        }
+
+        html5QrCode.start(camId, { fps: 10 }, onDecodeSuccess)
+            .then(function () {
+                setRunning(true);
+                showMsg("Scanning...", true);
+            })
+            .catch(function () {
+                showMsg("Camera failed", false);
+            });
+    }
+
+    function stopCamera() {
+        if (!running) return;
+
+        html5QrCode.stop().then(function () {
+            setRunning(false);
+            showMsg("Stopped", true);
+        });
+    }
+
+    function loadCameras() {
+        Html5Qrcode.getCameras().then(function (cameras) {
+            cameraSelect.innerHTML = "";
+
+            cameras.forEach(function (c, i) {
+                var opt = document.createElement("option");
+                opt.value = c.id;
+                opt.textContent = c.label || ("Camera " + (i + 1));
+                cameraSelect.appendChild(opt);
+            });
+
+            if (cameras.length > 0) {
+                btnStart.disabled = false;
+            }
+        });
+    }
+
+    btnStart.addEventListener("click", startCamera);
+    btnStop.addEventListener("click", stopCamera);
+
+    loadCameras();
+})();
+</script>
+
+</body>
+</html>

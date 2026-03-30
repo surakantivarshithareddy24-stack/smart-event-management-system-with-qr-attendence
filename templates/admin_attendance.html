@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Records - Smart Event Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <div>
+            <h1>Attendance Records</h1>
+            <p>All students' attendance across events</p>
+        </div>
+        <nav>
+            <a class="btn secondary" href="{{ url_for('admin_panel') }}">Back to Admin</a>
+            <a class="btn danger" href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    <div class="card">
+        {% if records %}
+            <table>
+                <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Event</th>
+                    <th>Attendance Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for r in records %}
+                    <tr>
+                        <td>{{ r.user_name }}</td>
+                        <td>{{ r.user_email }}</td>
+                        <td>{{ r.event_title }}</td>
+                        <td>{{ r.attendance_time }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No attendance records yet.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
+

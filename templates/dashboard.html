@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Smart Event Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Welcome, {{ user_name }}</p>
+        </div>
+        <nav>
+            {% if session.get('role') == 'admin' %}
+                <a class="btn secondary" href="{{ url_for('admin_panel') }}">Admin Panel</a>
+            {% endif %}
+            <a class="btn danger" href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <section class="grid">
+        <div class="card">
+            <h2>Available Events</h2>
+            {% if events %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for e in events %}
+                        <tr>
+                            <td>{{ e.title }}</td>
+                            <td>{{ e.date }}</td>
+                            <td>{{ e.location }}</td>
+                            <td>
+                                <a class="btn small"
+                                   href="{{ url_for('register_event', event_id=e.id) }}">
+                                    Register
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No events available yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>Your Registrations</h2>
+            {% if registrations %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>QR Code</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for r in registrations %}
+                        <tr>
+                            <td>{{ r.title }}</td>
+                            <td>{{ r.date }}</td>
+                            <td>{{ r.location }}</td>
+                            <td>
+                                <img class="qr-code-thumb"
+                                     src="{{ url_for('generate_qr', qr_token=r.qr_token) }}"
+                                     alt="QR"
+                                     width="200"
+                                     height="200">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>You have not registered for any events yet.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+</body>
+</html>
+

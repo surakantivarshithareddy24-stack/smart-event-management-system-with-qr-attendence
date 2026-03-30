@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard - Smart Event Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <div>
+            <h1>Student Dashboard</h1>
+            <p>Welcome, {{ user_name }}</p>
+        </div>
+        <nav>
+            <a class="btn danger" href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <section class="grid">
+        <div class="card">
+            <h2>Available Events</h2>
+            {% if events %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Location</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for e in events %}
+                        <tr>
+                            <td>{{ e.title }}</td>
+                            <td>{{ e.description }}</td>
+                            <td>{{ e.date }}</td>
+                            <td>{{ e.event_time }}</td>
+                            <td>{{ e.location }}</td>
+                            <td>
+                                {% if e.id in registered_event_ids %}
+                                    <span class="badge">Registered</span>
+                                {% else %}
+                                    <a class="btn small" href="{{ url_for('register_event', event_id=e.id) }}">Register</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No events available yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>Registered Events</h2>
+            {% if registered_events %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Location</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for e in registered_events %}
+                        <tr>
+                            <td>{{ e.title }}</td>
+                            <td>{{ e.description }}</td>
+                            <td>{{ e.date }}</td>
+                            <td>{{ e.event_time }}</td>
+                            <td>{{ e.location }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>You have not registered for any events yet.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+</body>
+</html>
+
